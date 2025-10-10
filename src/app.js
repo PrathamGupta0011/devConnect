@@ -14,25 +14,21 @@ So after this line, express becomes a function that can create an app.
 
 const app = express();
 
-//this will only handle GET call to /user
+const {adminAuth} =require("./middleware/auth");
 
-app.get("/user",(req,res) => {
-    res.send({firstname: "pratham", lastname:"gupta"});
+app.use("/admin",adminAuth);
+
+app.get("/user",(req,res)=>{
+    res.send("User Data Sent");
 });
 
-app.post("/user",(req,res)=>{
-    //saving data to db
-    res.send("data successfully saved to the database");
-})
-
-app.delete("/user",(req,res)=>{
-    res.send("deleted successfully");
-})
-//this will match all the http methods api calls to /test
-app.use("/test",(req,res)=>{
-    res.send("Hello from the server");
+app.get("/admin/getAllData",(req,res)=>{
+    res.send("All data sent");
 });
 
+app.get("/admin/deleteUser",(req,res)=>{
+    res.send("Deleted a User"); 
+})
 
 app.listen(7777, ()=>{
     console.log("server is successfully listening on the port 7777... ");
