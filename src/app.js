@@ -11,28 +11,23 @@ It loads the Express library and stores it in the variable express.
 So after this line, express becomes a function that can create an app.
  */
 
+const connectDB =require("./config/database");
 
 const app = express();
 
-const {adminAuth} =require("./middleware/auth");
 
-app.use("/admin",adminAuth);
-
-app.get("/user",(req,res)=>{
-    res.send("User Data Sent");
-});
-
-app.get("/admin/getAllData",(req,res)=>{
-    res.send("All data sent");
-});
-
-app.get("/admin/deleteUser",(req,res)=>{
-    res.send("Deleted a User"); 
-})
-
-app.listen(7777, ()=>{
+connectDB()
+.then(()=>{
+    console.log("Database connection Established...");
+    app.listen(7777, ()=>{
     console.log("server is successfully listening on the port 7777... ");
 });
+
+})
+.catch((err)=>{
+    console.error("Database can't be connected!!");
+});
+
 
 /**🖥️ 6. app.listen()
 
