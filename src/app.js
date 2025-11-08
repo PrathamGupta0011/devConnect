@@ -1,20 +1,24 @@
 const express = require('express');
-/**
- *  const express = require('express');
-
-The require() function in Node.js is used to import modules.
-
-When you run this line, Node looks into the node_modules folder for a package named express.
-
-It loads the Express library and stores it in the variable express.
-
-So after this line, express becomes a function that can create an app.
- */
-
 const connectDB =require("./config/database");
-
 const app = express();
+const User =require("./models/user");
 
+app.use(express.json());
+
+ 
+
+app.post("/signup", async (req,res) =>{
+    const user = new User(req.body);
+
+
+    try{
+        await user.save();
+    res.send("User Added Successfully"); 
+    } catch(err){
+        res.status(400).send("Error saving the user:"+ err.message);
+    }
+    
+});
 
 connectDB()
 .then(()=>{
@@ -26,6 +30,7 @@ connectDB()
 })
 .catch((err)=>{
     console.error("Database can't be connected!!");
+    console.error("Error Details:",err.message);
 });
 
 
