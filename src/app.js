@@ -13,12 +13,81 @@ app.post("/signup", async (req,res) =>{
 
     try{
         await user.save();
-    res.send("User Added Successfully"); 
+         res.send("User Added Successfully"); 
     } catch(err){
         res.status(400).send("Error saving the user:"+ err.message);
     }
     
+}); 
+
+// Get user by email
+app.get("/user", async(req,res)=>{
+    const userEmail = req.body.emailId;
+
+    try{
+        const users = await User.find({emailId: userEmail });
+        if(users.length ===0){
+            res.status(404).send("User Not Found");
+        }else{
+            res.send(users);
+
+        }
+        
+    }catch(err){
+        res.status(400).send("something went wrong");
+    }
 });
+
+
+
+// Feed Api - GET /Feed -get all the users from the database
+app.get("/feed", async(req,res)=>{
+    try{
+        const users = await User.find({});
+        res.send(users);
+    }catch(err){
+        res.status(400).send("something went wrong");
+    }
+
+}); 
+
+app.delete("/user" , async (req,res) =>{
+    const userId= req.body.userId;
+    try{
+        const user =await User.findByIdAndDelete(userId);
+
+        res.send("User deleted successfully");
+    }catch(err){
+        res.status(400).send("Something went wrong");
+    }
+});
+
+
+// Update the user
+app.patch("/user/:userId", async (req, res) =>{
+    const userId =req.params?.userId;
+    const data =req.body;
+    try{
+        const ALLOWED_UPDATES = ["photourl", "about", "gender", "age", "skills"];
+        const isUpdateAllowed =Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k));
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed");
+        }
+
+        if(data?.skills.length>10){
+            throw new Error("Update Not Allowed");
+        }
+
+        await User.findByIdAndUpdate({ _id: userId }, data);
+        res.send("user updated successfully");
+    }catch(err){
+        res.status(400).send("something went wrong");
+    }
+
+});
+
+
 
 connectDB()
 .then(()=>{
@@ -29,11 +98,8 @@ connectDB()
 
 })
 .catch((err)=>{
-    console.error("Database can't be connected!!");
+    console.error("Database can't be connected!");
     console.error("Error Details:",err.message);
 });
 
 
-/**🖥️ 6. app.listen()
-
-This tells Express to start the server and listen for incoming connections on a port. */
